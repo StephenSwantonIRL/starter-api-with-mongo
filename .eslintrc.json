@@ -1,0 +1,27 @@
+{
+  "env": {
+    "node": true
+
+  },
+  "extends": [
+    "airbnb-base",
+    "prettier"
+  ],
+  "parserOptions": {
+    "ecmaVersion": "2021",
+    "sourceType": "module"
+  },
+  "rules": {
+    "quotes": [
+      "error",
+      "double"
+    ],
+    "import/extensions": "off",
+    "import/prefer-default-export": "off",
+    "object-shorthand": "off",
+    "no-unused-vars": "off",
+    "no-underscore-dangle": "off",
+    "no-param-reassign": "off",
+    "no-undef": "off"
+  }
+}

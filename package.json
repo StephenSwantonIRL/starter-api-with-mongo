@@ -1,0 +1,51 @@
+{
+  "name": "placemark",
+  "version": "0.1.0",
+  "description": "An app documenting obscure and unsual places around the world. Derived from the WIT hDip PlayTime project",
+  "main": "src/server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/server.js",
+    "lint": "node node_modules/.bin/eslint . --ext .js",
+    "test": "node node_modules/mocha/bin/mocha --ui tdd test/**/*.js",
+    "dev": "nodemon  src/server.js --ignore 'src/models/json/*.json'"
+  },
+  "dependencies": {
+    "@hapi/bell": "^12.3.0",
+    "@hapi/boom": "^9.1.4",
+    "@hapi/cookie": "^11.0.2",
+    "@hapi/hapi": "^20.2.1",
+    "@hapi/hoek": "^10.0.0",
+    "@hapi/inert": "^6.0.5",
+    "@hapi/vision": "^6.1.0",
+    "axios": "^0.26.0",
+    "bcrypt": "^5.0.1",
+    "bulma": "^0.9.3",
+    "chai-as-promised": "^7.1.1",
+    "chai-http": "^4.3.0",
+    "cloudinary": "^1.28.1",
+    "dotenv": "^10.0.0",
+    "firebase": "^9.6.8",
+    "firebase-admin": "^10.0.2",
+    "handlebars": "^4.7.7",
+    "hapi-auth-jwt2": "^10.2.0",
+    "hapi-swagger": "^14.2.5",
+    "joi": "^17.5.0",
+    "jsonwebtoken": "^8.5.1",
+    "lodash": "^4.17.21",
+    "lowdb": "^3.0.0",
+    "mongoose": "^6.2.6",
+    "sanitize-html": "^2.7.0",
+    "uuid": "^8.3.2"
+  },
+  "devDependencies": {
+    "chai": "^4.3.4",
+    "eslint": "^8.4.1",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-import": "^2.25.3",
+    "mocha": "^9.1.3",
+    "nodemon": "^2.0.15",
+    "prettier": "^2.5.1"
+  }
+}
