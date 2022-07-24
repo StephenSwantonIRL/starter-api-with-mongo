@@ -2,10 +2,9 @@ import Boom from "@hapi/boom";
 import bcrypt from "bcrypt";
 import Joi from "joi";
 import { createToken } from "./jwt-utils.js";
-import { db } from "../src/models/db.js";
 import { UserArray, UserSpec, UserCredentialsSpec, UserSpecPlus, IdSpec, JwtAuth } from "../src/models/joi-schemas.js";
 import { validationError } from "./logger.js";
-import { tokenMongoStore } from "../src/models/mongo/token-mongo-store.js";
+import {MongoStore} from "../src/models/mongo/stores.js";
 
 const saltRounds = 10;
 
@@ -16,7 +15,7 @@ export const userApi = {
     },
     handler: async function(request, h) {
       try {
-        const users = await db.userStore.getAllUsers();
+        const users = await MongoStore.getAll("User");
         return users;
       } catch (err) {
         return Boom.serverUnavailable("Database Error");
@@ -34,7 +33,7 @@ export const userApi = {
     },
     handler: async function(request, h) {
       try {
-        const user = await db.userStore.getUserById(request.params.id);
+        const user = await MongoStore.getByProperty(request.params.id,"_id","User");
         if (!user) {
           return Boom.notFound("No User with this id");
         }
@@ -56,7 +55,7 @@ export const userApi = {
     },
     handler: async function(request, h) {
       try {
-        const user = await db.userStore.getUserByEmail(request.payload.email);
+        const user = await MongoStore.getByProperty(request.payload.email,"email", 'User');
         if (!user) {
           return Boom.notFound("No User with this email");
         }
@@ -78,7 +77,7 @@ export const userApi = {
       try {
         const userDetails = request.payload;
         userDetails.password = await bcrypt.hash(userDetails.password, saltRounds);
-        const user = await db.userStore.addUser(userDetails);
+        const user = await MongoStore.addOne(userDetails,"User");
         if (user) {
           return h.response(user).code(201);
         }
@@ -98,7 +97,7 @@ export const userApi = {
     auth: false,
     handler: async function(request, h) {
       try {
-        await db.userStore.deleteAll();
+        await MongoStore.deleteAll("User");
         return h.response().code(204);
       } catch (err) {
         return Boom.serverUnavailable("Database Error");
@@ -113,7 +112,7 @@ export const userApi = {
     auth: false,
     handler: async function(request, h) {
       try {
-        const user = await db.userStore.getUserByEmail(request.payload.email);
+        const user = await MongoStore.getByProperty(request.payload.email, "email", "User");
         if (user) {
           const passwordsMatch = await bcrypt.compare(request.payload.password, user.password);
           if (passwordsMatch) {
@@ -140,7 +139,7 @@ export const userApi = {
       strategy: "jwt",
     },
     handler: async function(request, h) {
-      const response = await tokenMongoStore.addRevokedToken({ token: request.auth.artifacts.token });
+      const response = await MongoStore.addOne({ token: request.auth.artifacts.token }, "Token");
       if (response) {
         return h.response(response).code(201);
       }
@@ -157,32 +156,5 @@ export const userApi = {
     },
   },
 
-  githubAuth: {
-    auth: {
-      strategy: "github-oauth",
-    },
-    handler: async function(request, h) {
-      if (!request.auth.isAuthenticated) {
-        return `Authentication failed due to: ${request.auth.error.message}`;
-      }
-      if (request.auth.isAuthenticated) {
-        const user = await db.userStore.getUserByGitHub(request.auth.credentials.profile.username);
-        if (!user) {
-          const [firstname, ...lastname] = (request.auth.credentials.profile.displayName).split(" ");
-          const gitHubUser = {
-            firstName: firstname,
-            lastName: lastname.join(" "),
-            email: request.auth.credentials.profile.email,
-            gitHub: request.auth.credentials.profile.username,
-          };
-          const string = new Buffer(JSON.stringify(gitHubUser)).toString("base64")
-          const convertedString = new Buffer(string, "base64").toString("ascii")
-          return h.redirect(`${process.env.frontEndDomain}/#/github/${ string}`)
-        }
-        const token = createToken(user);
-        return h.redirect(`${process.env.frontEndDomain}/#/auth/${user._id}/${token}`);
-      }
-    },
-  },
-  
+
 };

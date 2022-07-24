@@ -30,7 +30,5 @@ export const apiRoutes = [
 
   { method: "POST", path: "/api/revokeToken", config: userApi.revokeToken },
   { method: ["GET", "POST","DELETE"], path: "/api/checkToken", config: userApi.checkToken },
-  { method: "GET", path: "/github", config: userApi.githubAuth },
-  { method: ["GET", "POST"], path: "/auth", config: userApi.githubAuth },
 
 ];

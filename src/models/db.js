@@ -1,6 +1,6 @@
 import { userMongoStore} from "./mongo/user-mongo-store.js";
 import { placeMongoStore } from "./mongo/place-mongo-store.js";
-import { categoryMongoStore } from "./mongo/category-mongo-store.js";
+import { categoryMongoStore } from "./mongo/category-mongo-storeB.js";
 import { connectMongo } from "./mongo/connect.js";
 
 export const db = {

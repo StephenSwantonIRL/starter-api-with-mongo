@@ -1,6 +1,8 @@
 import Boom from "@hapi/boom";
 import _ from "lodash";
 import { db } from "../src/models/db.js";
+import { MongoStore } from "../src/models/mongo/stores.js";
+
 import {
   CategoryArray,
   CategorySpecPlus,
@@ -18,7 +20,7 @@ export const categoryApi = {
     },
     handler: async function(request, h) {
       try {
-        const categories = await db.categoryStore.getAllCategories();
+        const categories = await MongoStore.getAll("Category");
         return categories;
       } catch (err) {
         return Boom.serverUnavailable("Database Error");
@@ -32,12 +34,10 @@ export const categoryApi = {
   },
 
   findOne: {
-    auth: {
-      strategy: "jwt",
-    },
+    auth: false,
     handler: async function(request, h) {
       try {
-        const category = await db.categoryStore.getCategoryById(request.params.id);
+        const category = await MongoStore.getByProperty(request.params.id, "_id", "Category");
         if (!category) {
           return Boom.notFound("No Category with this id");
         }
@@ -54,13 +54,12 @@ export const categoryApi = {
   },
 
   create: {
-    auth: {
-      strategy: "jwt",
-    },
+    auth: false,
     handler: async function (request, h) {
       try {
         const category = request.payload;
-        const newCategory = await db.categoryStore.addCategory(category);
+        const newCategory = await MongoStore.addOne(category, "Category");
+        console.log(newCategory);
         if (newCategory) {
           return h.response(newCategory).code(201);
         }
@@ -82,11 +81,11 @@ export const categoryApi = {
     },
     handler: async function (request, h) {
       try {
-        const category = await db.categoryStore.getCategoryById(request.params.id);
+        const category = await MongoStore.getByProperty(request.params.id, "_id", "Category");
         if (!category) {
           return Boom.notFound("No Category with this id");
         }
-        await db.categoryStore.deleteCategoryById(category._id, true); // place holder of true for isAdmin untl
+        await MongoStore.deleteByProperty(category._id, "_id", "Category"); // place holder of true for isAdmin untl
         return h.response().code(204);
       } catch (err) {
         return Boom.serverUnavailable("No Category with this id");
@@ -104,7 +103,7 @@ export const categoryApi = {
     },
     handler: async function (request, h) {
       try {
-        await db.categoryStore.deleteAll();
+        await MongoStore.deleteAll("Category");
         return h.response().code(204);
       } catch (err) {
         return Boom.serverUnavailable("Database Error");
