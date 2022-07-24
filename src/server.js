@@ -7,11 +7,11 @@ import dotenv from "dotenv";
 import path from "path";
 import Joi from "joi";
 import jwt from "hapi-auth-jwt2";
-import { validate } from "../api/jwt-utils.js";
-import { fileURLToPath } from "url";
-import { apiRoutes } from "./api-routes.js"
-import { db } from "./models/db.js";
 import HapiSwagger from "hapi-swagger";
+import { fileURLToPath } from "url";
+import { validate } from "../api/jwt-utils.js";
+import { apiRoutes } from "./api-routes.js"
+import {connectMongo} from "./models/mongo/connect.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -77,7 +77,7 @@ async function init() {
 
   server.auth.default("jwt");
 
-  db.init("mongo");
+  connectMongo();
   server.route(apiRoutes);
   await server.start();
   console.log("Server running on %s", server.info.uri);

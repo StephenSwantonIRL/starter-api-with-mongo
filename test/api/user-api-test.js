@@ -3,13 +3,13 @@ import { assert } from "chai";
 import { assertSubset } from "../test-utils.js";
 import { placeMarkService } from "./placemark-service.js";
 import { maggie, testUsers, maggieCredentials } from "../fixtures.js";
-import { db } from "../../src/models/db.js";
+import {connectMongo} from "../../src/models/mongo/connect.js";
 
 const users = new Array(testUsers.length);
 
 suite("User API tests", () => {
   setup(async () => {
-    db.init("mongo");
+    connectMongo()
     await placeMarkService.deleteAllUsers();
     await placeMarkService.createUser(maggie);
     await placeMarkService.authenticate(maggieCredentials);

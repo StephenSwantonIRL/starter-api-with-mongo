@@ -94,7 +94,9 @@ export const userApi = {
   },
 
   deleteAll: {
-    auth: false,
+    auth: {
+      strategy: "jwt",
+    },
     handler: async function(request, h) {
       try {
         await MongoStore.deleteAll("User");

@@ -1,7 +1,17 @@
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
-import { db } from "../src/models/db.js";
-import { tokenMongoStore } from "../src/models/mongo/token-mongo-store.js";
+import {MongoStore} from "../src/models/mongo/stores.js";
+
+async function checkToken(token)
+  {
+    const tokenToCheck = await MongoStore.getByProperty(token,"token","Token");
+    if (tokenToCheck) {
+      return "revoked";
+    }
+    return "ok";
+
+}
+
 
 const result = dotenv.config();
 
@@ -30,11 +40,11 @@ export function decodeToken(token) {
 }
 
 export async function validate(decoded, request) {
-  const token = await tokenMongoStore.checkToken(request.auth.token);
+  const token = await checkToken(request.auth.token);
   if (token !== "ok") {
     return { isValid: false };
   }
-  const user = await db.userStore.getUserById(decoded.id);
+  const user = await MongoStore.getByProperty(decoded.id, "_id", "User");
   if (!user) {
     return { isValid: false };
   }

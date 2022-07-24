@@ -1,14 +1,12 @@
 /* eslint-disable no-else-return */
 import _ from "lodash";
 // import all mongo schemas
-import { Category } from "./category.js";
 import { User } from "./user.js";
 import { Token } from "./revokedToken.js";
 //
 
 const stores = new Map();
 
-stores.set("Category", Category )
 stores.set("User", User )
 stores.set("Token", Token)
 
